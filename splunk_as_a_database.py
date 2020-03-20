@@ -6,6 +6,7 @@ import xmltodict
 import requests
 from requests.auth import HTTPBasicAuth
 import urllib3
+import datetime
 
 
 # Use Splunks REST API as a database
@@ -19,6 +20,21 @@ def splunkudpsender(datatosend, splunksettings):
     SplunkIP = splunksettings["SplunkIP"]
     SplunkPort = int(splunksettings["SplunkPort"])
     # Now convert the message to bytes
+    MESSAGE = str.encode(datatosend)
+    # Set up the socket to send (btw, how good is python)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Send datagram (UDP)
+    sock.sendto(MESSAGE, (SplunkIP, SplunkPort))
+    sock.close()
+    sleep(0.01)
+
+# Function to send data via UDP to Splunk but specifying the port
+def splunkudpportsender(datatosend, SplunkIP, SplunkPort):
+    # Convert SplunkIP to string
+    SplunkIP = str(SplunkIP)
+    # Convert SplunkPort to int
+    SplunkPort = int(SplunkPort)
+    # Convert message to bytes
     MESSAGE = str.encode(datatosend)
     # Set up the socket to send (btw, how good is python)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -136,4 +152,7 @@ def sendtosplunk(data, exchange, splunksettings):
         exchangedata = str(exchangedata)
         # Now send joyfully to Splunk
         splunkudpsender(exchangedata, splunksettings)
+
+
+
 

@@ -10,6 +10,7 @@ from coinbase import coinbasedatasearching
 from binance import binancedatasearching
 from coinbase import coinbasetradingalgorithm
 from binance import binancetradingalgorithms
+from TradingAlgorithms import TradingLibrary
 import pandas
 
 
@@ -22,7 +23,7 @@ BinanceFilepath = ""
 
 
 # Get file path for keys
-def main(BinanceFilepath="", SplunkSettings="", Token="ETH"):
+def main(BinanceFilepath="", SplunkSettings=""):
     # Create welcome banner for a bit of fun :)
     welcome_banner = pyfiglet.figlet_format("Welcome to CryptoTrading Library")
     print(welcome_banner)
@@ -50,7 +51,7 @@ def main(BinanceFilepath="", SplunkSettings="", Token="ETH"):
     SplunkSettingsFilepath = Path(SplunkSettings)
 
     # Load the settings from the file into memory
-    binancekeys = binancetradingalgorithms.getbinancekeys(BinanceKeysFilePath)
+    # binancekeys = binancetradingalgorithms.getbinancekeys(BinanceKeysFilePath)
     print("Binance Keys Loaded")
     splunksettings = splunk_as_a_database.getsplunksettings(SplunkSettingsFilepath)
     print("Splunk settings loaded")
@@ -90,19 +91,8 @@ def main(BinanceFilepath="", SplunkSettings="", Token="ETH"):
     print(BinanceTokens)
 
     while 1:
-        # Search through available Coinbase tokens
-        for base in CoinbaseTokens.base.items():
-            # Convert Token name into a string
-            basetoken = str(base[1])
-            #print("Analysing: " + basetoken)
-            Token = basetoken
-            # No need to confirm it as it comes from the same confirmation list
-            # Get data about the token
-            #print("Getting data for " + basetoken)
-            tokendata = coinbasedatasearching.searchcoinbasedata(Token, "24h", SplunkSettingsFilepath)
-            outcome = coinbasetradingalgorithm.hypothesisone(tokendata, 2)
-            # print(outcome)
-            print(Token + ": " + outcome)
+        # Search through available Binance tokens
+        TradingLibrary.hypothesisone(BinanceTokens, CoinbaseTokens, SplunkSettingsFilepath, sessionkey, 2)
 
 
 # Function to select which exchange and token to search

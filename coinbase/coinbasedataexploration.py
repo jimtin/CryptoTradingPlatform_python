@@ -8,10 +8,6 @@ import matplotlib.pyplot as pyplot
 #######################################################################
 
 # Simple linegraph of coinbase data
-from coinbase.coinbasedatasearching import mungecoinbasedata
-from helperfunctions import getdataframe
-
-
 def coinbaselinegraph(DataFrame, token):
     # Sort the DataFrame according to dates
     df = DataFrame.sort_values('DateTime', ascending=True)

@@ -4,28 +4,40 @@ import matplotlib.pyplot as pyplot
 from coinbase import coinbasedatasearching
 import json
 
+########################################################################################################################
+# Library to explore trading hypothesis for binance
+########################################################################################################################
 
 # Trade Hypothesis 1: If price increases each hour over 2 hours, the next hour will see another price rise
-# Trade Hypothesis 2: If price stops increasing hour over hour, I should sell as it will fall soon
-# Considerations: Optimising this algorithm will take time, as I will have limited resources to trade ALL rising stocks
-# Benchmark against: BTC, ETH, EOS and BNB
 
-
-# Function to get the average price over time of a token
-def gettokenpriceovertime(exchange, token, timeframe, FilePath):
-
-    # Search splunk to get a list of unique tokens for that exchange
-    # Each exchange deals with things a little differently so will need to construct searches based on the exchange
-    # Have already validated the exchange in the constructexchangesplunksearch function, so proceed on assumption it is valid
-    # todo: expand this to be able to search an array / list of values
-    if exchange == "binance":
-        binancedatasearching.searchbinancedata(token, timeframe, FilePath)
-
-    elif exchange == "coinbase":
-        exchangedata = coinbasedatasearching.searchcoinbasedata(token, timeframe, FilePath)
-        print(exchangedata)
+# Function to explore Hypothesis 1
+def hypothesisone(DataFrame, Tolerance):
+    # First, take the DataFrame, split it into hours
+    DataFrame = DataFrame.groupby(DataFrame.index.hour).mean()
+    if len(DataFrame.index) < 5:
+        outcome = "Not enough data"
+        return outcome
     else:
-        return False
+        # Second, get the percentage change of token per hour
+        # Note: I'm currently using a 24h search. The first row of pct_change will always return with NaN as it has one value.
+        # This is slightly expensive for the Splunk search, but only marginally so have kept it
+        HourChange = DataFrame.pct_change()
+        # Test against the tolerance using a lambda function
+        HourChange["MetTolerance"] = HourChange["lastPrice"].apply(lambda x: "True" if x >= Tolerance else "False")
+        # Now select final two hours
+        TwoHours = HourChange.tail(2)
+        # See if they have risen by the tolerance
+        if TwoHours.take([0]).MetTolerance.item() == "True":
+            if TwoHours.take([0]).MetTolerance.item() == "True":
+                outcome = "Buy"
+                return outcome
+            else:
+                outcome = "PartialBuy"
+                return outcome
+        else:
+            outcome = "NoBuy"
+            return outcome
+
 
 
 # Function to get binance keys from the BinanceFilePath
@@ -38,6 +50,3 @@ def getbinancekeys(filepath):
     # Create a dict with the keys
     Keys = keydata['binance']
     return Keys
-
-
-

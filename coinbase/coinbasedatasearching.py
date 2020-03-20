@@ -6,7 +6,7 @@ import pandas
 
 
 # Function to handle the searching
-def searchcoinbasedata(token, timeframe, FilePath):
+def searchcoinbasedata(token, timeframe, FilePath, SplunkToken):
     # Confirm if the tokes provided are 1 or many (list)
     if isinstance(token, str):
         tokeninfo = searchsingletoken(token, timeframe, FilePath)
@@ -14,14 +14,14 @@ def searchcoinbasedata(token, timeframe, FilePath):
 
 
 # Function to search a single token from splunk
-def searchsingletoken(token, timeframe, FilePath):
+def searchsingletoken(token, timeframe, FilePath, SplunkToken):
     # Construct the initial query
     basequery = helperfunctions.constructexchangesplunksearch("coinbase", FilePath, timeframe)
     # For coinbase, use base to get token symbol
     splunkquery = basequery + " base=" + token + " | table DateTime, amount, base"
     # The list search term will need to know how to search
     searchterm = "base"
-    tokeninfo = splunk_as_a_database.querysplunk(splunkquery, FilePath)
+    tokeninfo = splunk_as_a_database.querysplunk(splunkquery, FilePath, SplunkToken)
     # Convert returned info into a dataframe
     tokeninfo = helperfunctions.getdataframe(tokeninfo)
     # Take dataframe and munge data into the objects required for further investigation
@@ -34,8 +34,6 @@ def searchsingletoken(token, timeframe, FilePath):
 def mungecoinbasedata(DataFrame):
     # Convert the amount to a float
     DataFrame["amount"] = pandas.to_numeric(DataFrame["amount"])
-    # Convert the base to a string
-    # DataFrame["base"] = DataFrame["base"].to_string()
     return DataFrame
 
 
