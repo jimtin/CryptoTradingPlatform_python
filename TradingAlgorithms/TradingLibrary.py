@@ -60,8 +60,8 @@ def hypothesisone(BinanceTokens, CoinbaseTokens, SplunkSettingsFilepath, SplunkT
         # Turn into JSON
         resultjson = json.dumps(resultdict)
         # Send result to Splunk
-        splunk_as_a_database.splunkudpportsender(resultjson, SplunkIP=SplunkSettings["SplunkIP"],
-                                                 SplunkPort=SplunkSettings["TradingDataPort"])
+        # splunk_as_a_database.splunkudpportsender(resultjson, SplunkIP=SplunkSettings["SplunkIP"],
+                                                 # SplunkPort=SplunkSettings["TradingDataPort"])
 
 
 

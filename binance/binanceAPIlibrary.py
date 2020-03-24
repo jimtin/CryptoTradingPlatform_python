@@ -4,6 +4,7 @@ import hmac
 import hashlib
 import json
 import datetime
+from databasing import mongodb
 
 # test the binance api to see if it's working.
 def binanceapiinit():
@@ -233,6 +234,16 @@ def getpricechanges(symbol="ALL"):
     information = session.get(apirequest)
     # Convert into json
     pricechange = json.loads(information.text)
-    return pricechange
+    # Iterate through the list and append exchange and timestamp before adding back into a list
+    updatedbinancedata = []
+    for token in pricechange:
+        # Add in the exchange
+        token.update({"Exchange": "binance"})
+        # Add in the timestamp
+        token.update({"DateTimeGathered": str(datetime.datetime.now())})
+        updatedbinancedata.append(token)
+    # When completed append to the collection binance in mongo
+    outcome = mongodb.insertmanyintocrypto("binance", updatedbinancedata)
+    return outcome
 
 

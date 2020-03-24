@@ -1,5 +1,7 @@
 import requests
 import json
+from time import sleep
+import datetime
 
 # Library to get basic prices from coinbase
 
@@ -13,7 +15,8 @@ def getspotpricecoinbase(currencypair):
     session = requests.session()
     information = session.get(apirequest)
     # Convert into json
-    return information.text
+    outcome = json.loads(information.text)
+    return outcome["data"]
 
 
 # Get the BTC spot price
@@ -47,4 +50,18 @@ def combinespotprices():
     spotprices.append(eth)
     return spotprices
 
-
+# Function to get a list of Coinbase currencies
+def getlistfromcoinbase(list):
+    spotprices = []
+    for currencypair in list:
+        print("Getting: " + currencypair)
+        # Get currency pair from coinbase
+        token = getspotpricecoinbase(currencypair)
+        # Append the name of the exchange and time stamp when it was gathered
+        token.update({"Exchange": "coinbase"})
+        token.update({"DateTimeGathered": str(datetime.datetime.now())})
+        # token = json.loads(token)
+        spotprices.append(token)
+        # Coinbase has an API limit of 3 requests per second
+        sleep(0.5)
+    return spotprices
