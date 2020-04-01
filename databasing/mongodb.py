@@ -38,8 +38,8 @@ def insertmanyintocrypto(exchange, Data):
     cryptoinsert = insertmanydata("CryptoExchange", exchange, Data)
     return cryptoinsert
 
-# Retrieve data from mongodb
-def retrivesingleresult(Database, Collection):
+# Retrieve single row of data from mongodb
+def getsingleresult(Database, Collection):
     # Make sure Database is a string
     Database = str(Database)
     # Create the client
@@ -53,6 +53,81 @@ def retrivesingleresult(Database, Collection):
     return result
 
 # Wrapper for retrieving a single result from Cryptoexchange database and exchange
-def retrievesingleexchangeresult(exchange):
-    outcome = retrivesingleresult("CryptoExchange", exchange)
+def getsingleexchangeresult(exchange):
+    outcome = getsingleresult("CryptoExchange", exchange)
     return outcome
+
+# Retrieve multiple rows of data from mongodb
+def getalldatafromcollection(Database, Collection):
+    # Make sure Database is a string
+    Database = str(Database)
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to Database
+    database = mongoclient[Database]
+    # Create a collection
+    collection = database[Collection]
+    # Get search
+    result = collection.find()
+    # Turn result into a list
+    outcome = list(result)
+    return outcome
+
+# Retrieve all data from a Cryptoexchange collection
+def getalldatafromexchange(exchange):
+    # Get data from collection
+    outcome = getalldatafromcollection("CryptoExchange", exchange)
+    return outcome
+
+# Retrieve data from a query
+def getquerydatafromcollection(Database, Collection, Query):
+    # Make sure Database is a string
+    Database = str(Database)
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to Database
+    database = mongoclient[Database]
+    # Create a collection
+    collection = database[Collection]
+    # Insert query
+    result = collection.find(Query)
+    # Turn result into a list
+    outcome = list(result)
+    # Return result to user
+    return outcome
+
+# Retrieve query data from binance
+def getbinancequerydata(Query):
+    # Get data from collection = binance
+    outcome = getquerydatafromcollection("CryptoExchange", "binance", Query)
+    return outcome
+
+# Retrieve query data from coinbase
+def getcoinbasequerydata(Query):
+    outcome = getquerydatafromcollection("CryptoExchange", "coinbase", Query)
+    return outcome
+
+# Get a list of unique values in binance
+def getuniquebinancetokens():
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to Database
+    database = mongoclient["CryptoExchange"]
+    # Get collection
+    collection = database["binance"]
+    # Get unique values
+    outcome = collection.distinct("symbol")
+    return outcome
+
+# Get a list of unique values in coinbase
+def getuniquecoinbasetokens():
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to Database
+    database = mongoclient["CryptoExchange"]
+    # Get collection
+    collection = database["coinbase"]
+    # Get unique values
+    outcome = collection.distinct("base")
+    return outcome
+

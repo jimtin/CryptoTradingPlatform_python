@@ -5,6 +5,7 @@ import hashlib
 import json
 import datetime
 from databasing import mongodb
+import logging
 
 # test the binance api to see if it's working.
 def binanceapiinit():
@@ -223,12 +224,16 @@ def getrecenttrades(PublicKey, symbol, limit=500):
 
 # Get 24 hour price change statistics for specified symbols
 def getpricechanges(symbol="ALL"):
+    logging.basicConfig(filename="app.log", filemode="a", format='%(asctime)s - %(process)d - %(message)s',
+                        level=logging.INFO)
     apirequest = "https://api.binance.com/api/v3/ticker/24hr"
     # Construct the apirequest based upon symbol provided
     if symbol == "ALL":
         apirequest = apirequest
+        logging.info("Getting list of all tokens from binance")
     else:
         apirequest = apirequest + "&symbol=" + symbol
+        logging.info(f"Getting {symbol} from binance")
     session = requests.session()
     # Get 24 hour price change statistics for specified symbols
     information = session.get(apirequest)
@@ -243,6 +248,7 @@ def getpricechanges(symbol="ALL"):
         token.update({"DateTimeGathered": str(datetime.datetime.now())})
         updatedbinancedata.append(token)
     # When completed append to the collection binance in mongo
+    logging.info("Inserting binance results into mongodb")
     outcome = mongodb.insertmanyintocrypto("binance", updatedbinancedata)
     return outcome
 

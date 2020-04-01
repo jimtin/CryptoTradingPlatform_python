@@ -29,19 +29,18 @@ def main(BinanceFilepath=""):
     welcome_banner = pyfiglet.figlet_format("Welcome to CryptoTrading Library")
     print(welcome_banner)
 
+    while 1:
     # Get data from exchanges
-    print("Getting binance prices")
-    binanceAPIlibrary.getpricechanges()
+        print("Getting binance prices")
+        binanceAPIlibrary.getpricechanges()
 
-    print("Getting coinbase spot prices")
-    coinbaselist = ["BTC-USD", "ETH-USD", "XRP-USD", "BCH-USD", "BSV-USD", "LTC-USD", "EOS-USD", "XTZ-USD", "XLM-USD",
-                    "LINK-USD", "DASH-USD", "ETC-USD", "ATOM-USD", "ZEC-USD", "BAT-USD", "ZRX-USD", "REP-USD",
-                    "KNC-USD",
-                    "DAI-USD"]
-    coinbasespotprices = coinbaselibrary.getlistfromcoinbase(coinbaselist)
-    print(coinbasespotprices)
-    insertdata = mongodb.insertmanyintocrypto("coinbase", coinbasespotprices)
-    print(insertdata)
+        print("Getting coinbase spot prices")
+        coinbaselist = ["BTC-USD", "ETH-USD", "XRP-USD", "BCH-USD", "BSV-USD", "LTC-USD", "EOS-USD", "XTZ-USD", "XLM-USD",
+                        "LINK-USD", "DASH-USD", "ETC-USD", "ATOM-USD", "ZEC-USD", "BAT-USD", "ZRX-USD", "REP-USD",
+                        "KNC-USD",
+                        "DAI-USD"]
+        coinbasespotprices = coinbaselibrary.getlistfromcoinbase(coinbaselist)
+        sleep(30)
 
     # Setup the filepaths for getting settings
     # First: Get Binance keys

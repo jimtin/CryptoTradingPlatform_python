@@ -2,6 +2,8 @@ import requests
 import json
 from time import sleep
 import datetime
+import logging
+from databasing import mongodb
 
 # Library to get basic prices from coinbase
 
@@ -52,9 +54,11 @@ def combinespotprices():
 
 # Function to get a list of Coinbase currencies
 def getlistfromcoinbase(list):
+    logging.basicConfig(filename="app.log", filemode="a", format='%(asctime)s - %(process)d - %(message)s', level=logging.INFO)
     spotprices = []
+    logging.info(f"Getting the list of tokens: {spotprices}")
     for currencypair in list:
-        print("Getting: " + currencypair)
+        # logging.info(f"Getting token {token}")
         # Get currency pair from coinbase
         token = getspotpricecoinbase(currencypair)
         # Append the name of the exchange and time stamp when it was gathered
@@ -64,4 +68,7 @@ def getlistfromcoinbase(list):
         spotprices.append(token)
         # Coinbase has an API limit of 3 requests per second
         sleep(0.5)
-    return spotprices
+    # When completed append to the collection coinbase in mongo
+    logging.info("Inserting coinbase results into mongodb")
+    outcome = mongodb.insertmanyintocrypto("coinbase", spotprices)
+    return outcome

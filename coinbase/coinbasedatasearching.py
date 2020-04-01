@@ -1,48 +1,21 @@
-import helperfunctions
-import splunk_as_a_database
 import pandas
+from datamunging import genericdatamunging
+from databasing import mongodb
 
-# Library for searching coinbase data from splunk
+# Library for retrieving coinbase data from database
 
+# Get a single token from coinbase data
+def getcoinbasetoken(Token):
+    # Make sure token is a string
+    Token = str(Token)
+    # Construct the query to be passed to mongo search
+    Query = {'base': Token}
+    outcome = genericdatamunging.getlastcoinbasepricedata(Query)
+    return outcome
 
-# Function to handle the searching
-def searchcoinbasedata(token, timeframe, FilePath, SplunkToken):
-    # Confirm if the tokes provided are 1 or many (list)
-    if isinstance(token, str):
-        tokeninfo = searchsingletoken(token, timeframe, FilePath)
-        return tokeninfo
-
-
-# Function to search a single token from splunk
-def searchsingletoken(token, timeframe, FilePath, SplunkToken):
-    # Construct the initial query
-    basequery = helperfunctions.constructexchangesplunksearch("coinbase", FilePath, timeframe)
-    # For coinbase, use base to get token symbol
-    splunkquery = basequery + " base=" + token + " | table DateTime, amount, base"
-    # The list search term will need to know how to search
-    searchterm = "base"
-    tokeninfo = splunk_as_a_database.querysplunk(splunkquery, FilePath, SplunkToken)
-    # Convert returned info into a dataframe
-    tokeninfo = helperfunctions.getdataframe(tokeninfo)
-    # Take dataframe and munge data into the objects required for further investigation
-    tokeninfo = mungecoinbasedata(tokeninfo)
-    # Returns a dataframe with data correctly munged
-    return tokeninfo
-
-
-# Munge coinbase data into a cool dataframe
-def mungecoinbasedata(DataFrame):
-    # Convert the amount to a float
-    DataFrame["amount"] = pandas.to_numeric(DataFrame["amount"])
-    return DataFrame
-
-
-# Function to get a list of tokens being searched and saved from Coinbase
-def getlistofcoinbasetokens(timeframe, FilePath, sessionkey=""):
-    # Construct the initial query
-    basequery = helperfunctions.constructexchangesplunksearch("coinbase", FilePath, timeframe)
-    splunkquery = basequery + " | dedup base | table base"
-    tokenlist = splunk_as_a_database.querysplunk(splunkquery, FilePath, sessionkey)
-    return tokenlist
+# Get a list of unique token values from coinbase
+def getuniquecoinbasetokens():
+    outcome = mongodb.getuniquecoinbasetokens()
+    return outcome
 
 
