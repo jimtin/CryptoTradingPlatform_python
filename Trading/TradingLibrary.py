@@ -19,6 +19,7 @@ def implementalgorithmone(Tolerance=2):
     logging.info("Starting algorithm one")
     # Get a list of coinbase tokens
     coinbaselist = coinbasedatasearching.getuniquecoinbasetokens()
+    coinbasenum = len(coinbaselist)
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in coinbaselist:
         # First get the data for each token
@@ -28,6 +29,7 @@ def implementalgorithmone(Tolerance=2):
         recordrecommendation(outcome)
     ############ Binance ############
     binancelist = binancedatasearching.getuniquebinancetokens()
+    binancenum = len(binancelist)
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in binancelist:
         # First get the data for each token
@@ -37,10 +39,9 @@ def implementalgorithmone(Tolerance=2):
         recordrecommendation(outcome)
 
     end = timer()
-    print(end)
-    timetaken = end-start
-    print(timetaken)
-    logging.info(f'Algorithm one completed, total time taken (in seconds): {timetaken}')
+    timetaken = end - start
+    totaltokens = coinbasenum + binancenum
+    logging.info(f'Algorithm one completed on {totaltokens} tokens, total time taken (in seconds): {timetaken}')
 
 # Insert the trading recommendation into Database collection
 def recordrecommendation(Data):
