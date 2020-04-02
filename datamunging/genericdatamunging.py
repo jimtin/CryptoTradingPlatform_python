@@ -34,6 +34,7 @@ def getlastbinancepricedata(Query):
     df = pandas.DataFrame(result)
     # Convert column 'symbol' into string, then rename to token
     df['symbol'] = df['symbol'].astype(str)
+    df.rename(columns={'symbol': 'Token'}, inplace=True)
     # Convert column 'exchange' into string
     df['Exchange'] = df['Exchange'].astype(str)
     # Convert column lastPrice into float, then rename Price

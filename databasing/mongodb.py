@@ -38,6 +38,11 @@ def insertmanyintocrypto(exchange, Data):
     cryptoinsert = insertmanydata("CryptoExchange", exchange, Data)
     return cryptoinsert
 
+# Wrapper for inserting into the TradingRecommendations database
+def insertsingleintotradingrecommendations(Data):
+    recommendation = insertsingledata("TradingDatabase", "RawRecommendations", Data)
+    return recommendation
+
 # Retrieve single row of data from mongodb
 def getsingleresult(Database, Collection):
     # Make sure Database is a string
@@ -131,3 +136,14 @@ def getuniquecoinbasetokens():
     outcome = collection.distinct("base")
     return outcome
 
+# Get a list of unique values in binance
+def getuniquebinancetokens():
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to Database
+    database = mongoclient["CryptoExchange"]
+    # Get collection
+    collection = database["binance"]
+    # Get unique values
+    outcome = collection.distinct("symbol")
+    return outcome
