@@ -36,7 +36,7 @@ def implementalgorithmone(Tolerance=2):
         print(outcome)
         recordrecommendation(outcome)
 
-    end = timer
+    end = timer()
     print(end)
     timetaken = end-start
     print(timetaken)
