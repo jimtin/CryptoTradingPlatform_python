@@ -19,3 +19,8 @@ I plan to turn this into a small revenue gathering mechanism for myself, so open
 - Implementation of parallel processing. This will ensure that data gathering is performed separately from analysis
 - Implementation of confirmation analysis. I.e. are these trading recommendations historically more effective than HODLing?
 - Potential integration with the GolemProject once computer requirements start expanding. This is particularly exciting with their recent implementation of the TaskAPI
+- Implementation of more algorithms
+
+## What is Algorithm One
+*Hypothesis: * If the price of a token _in any currency_ rises by more than a specified value for two hours, it will rise in the third hour
+*Options: * User specifies tolerance 
