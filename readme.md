@@ -22,5 +22,5 @@ I plan to turn this into a small revenue gathering mechanism for myself, so open
 - Implementation of more algorithms
 
 ## What is Algorithm One
-*Hypothesis: * If the price of a token _in any currency_ rises by more than a specified value for two hours, it will rise in the third hour
-*Options: * User specifies tolerance 
+**Hypothesis: ** If the price of a token _in any currency_ rises by more than a specified value for two hours, it will rise in the third hour
+**Options: ** User specifies tolerance 
