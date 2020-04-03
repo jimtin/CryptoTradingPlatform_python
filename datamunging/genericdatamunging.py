@@ -1,5 +1,6 @@
 from databasing import mongodb
 import pandas
+from timeit import default_timer as timer
 
 # Library to convert data from various exchanges into a single coherent datatype. Output should always be a dataframe
 
@@ -29,6 +30,7 @@ def getlastcoinbasepricedata(Query):
 
 # Get binance dataframe and munge into a consistent set of fields
 def getlastbinancepricedata(Query):
+    start = timer()
     result = mongodb.getbinancequerydata(Query)
     # Convert result into dataframe
     df = pandas.DataFrame(result)
@@ -44,29 +46,34 @@ def getlastbinancepricedata(Query):
     df['DateTimeGathered'] = pandas.to_datetime(df['DateTimeGathered'])
     # Now drop any rows with NaN or NaT
     df = df.dropna()
-    # Drop all the other rows. This may seem very manual, but it will allow future fields to be easily added back in
-    df = df.drop('priceChange', axis=1)
-    df = df.drop('priceChangePercent', axis=1)
-    df = df.drop('weightedAvgPrice', axis=1)
-    df = df.drop('prevClosePrice', axis=1)
-    df = df.drop('lastQty', axis=1)
-    df = df.drop('bidPrice', axis=1)
-    df = df.drop('bidQty', axis=1)
-    df = df.drop('askPrice', axis=1)
-    df = df.drop('askQty', axis=1)
-    df = df.drop('openPrice', axis=1)
-    df = df.drop('highPrice', axis=1)
-    df = df.drop('lowPrice', axis=1)
-    df = df.drop('volume', axis=1)
-    df = df.drop('quoteVolume', axis=1)
-    df = df.drop('openTime', axis=1)
-    df = df.drop('closeTime', axis=1)
-    df = df.drop('firstId', axis=1)
-    df = df.drop('lastId', axis=1)
-    df = df.drop('count', axis=1)
+    # Drop ID column as no longer needed
     df = df.drop('_id', axis=1)
     # Create the index based upon DateTime object
     df.set_index('DateTimeGathered', inplace=True, drop=True)
+    # Drop all the other rows. This may seem very manual, but it will allow future fields to be easily added back in
+    #df = df.drop('priceChange', axis=1)
+    #df = df.drop('priceChangePercent', axis=1)
+    #df = df.drop('weightedAvgPrice', axis=1)
+    #df = df.drop('prevClosePrice', axis=1)
+    #df = df.drop('lastQty', axis=1)
+    #df = df.drop('bidPrice', axis=1)
+    #df = df.drop('bidQty', axis=1)
+    #df = df.drop('askPrice', axis=1)
+    #df = df.drop('askQty', axis=1)
+    #df = df.drop('openPrice', axis=1)
+    #df = df.drop('highPrice', axis=1)
+    #df = df.drop('lowPrice', axis=1)
+    #df = df.drop('volume', axis=1)
+    #df = df.drop('quoteVolume', axis=1)
+    #df = df.drop('openTime', axis=1)
+    #df = df.drop('closeTime', axis=1)
+    #df = df.drop('firstId', axis=1)
+    #df = df.drop('lastId', axis=1)
+    #df = df.drop('count', axis=1)
+
+    end = timer()
+    totaltime = end-start
+    # print(totaltime)
     return df
 
 

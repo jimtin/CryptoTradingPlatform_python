@@ -23,19 +23,25 @@ def implementalgorithmone(Tolerance=2):
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in coinbaselist:
         # First get the data for each token
-        tokendata = coinbasedatasearching.getcoinbasetoken(Token=token)
+        tokendata = coinbasedatasearching.gettimeframecoinbasetoken(Token=token, TimeFrame=4)
         # Now run this data through algorithm one
         outcome = algorithmone.algorithmone(tokendata, Tolerance)
         recordrecommendation(outcome)
     ############ Binance ############
+    # For Binance, given the much greater efficacacy of data, will need to take a different approach
+    # Get a list of unique binance tokens available to search
     binancelist = binancedatasearching.getuniquebinancetokens()
+    # Get the lenght of this list to analyze efficiency of search
     binancenum = len(binancelist)
+    # Now get a dataframe of ALL binance data from past four hours
+    binancedata = binancedatasearching.gettimeframealltokens(4)
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in binancelist:
-        # First get the data for each token
-        tokendata = binancedatasearching.getbinancetoken(Token=token)
+        # Slice binance data into a smaller chunk
+        tokendata = binancedata[binancedata.Token.eq(token)]
+        # Now analyse smaller dataframe
         outcome = algorithmone.algorithmone(tokendata, Tolerance)
-        print(outcome)
+        # Record the recommendation
         recordrecommendation(outcome)
 
     end = timer()

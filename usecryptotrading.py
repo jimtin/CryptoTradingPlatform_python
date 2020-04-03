@@ -1,20 +1,6 @@
-from pathlib import Path
 import pyfiglet # For a bit of fun :)
-import json
 from binance import binanceAPIlibrary
-from time import sleep
-import datetime
 from coinbase import coinbaselibrary
-from databasing import mongodb
-import pandas
-
-
-# Declare the Global Variables needed
-Exchanges = pandas.DataFrame()
-CoinbaseTokens = pandas.DataFrame()
-BinanceTokens = pandas.DataFrame()
-SplunkSettings = ""
-BinanceFilepath = ""
 
 
 # Get file path for keys
@@ -34,5 +20,7 @@ def main():
                         "KNC-USD",
                         "DAI-USD"]
         coinbasespotprices = coinbaselibrary.getlistfromcoinbase(coinbaselist)
+
+main()
 
 
