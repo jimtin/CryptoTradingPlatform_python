@@ -135,15 +135,3 @@ def getuniquecoinbasetokens():
     # Get unique values
     outcome = collection.distinct("base")
     return outcome
-
-# Get a list of unique values in binance
-def getuniquebinancetokens():
-    # Create the client
-    mongoclient = MongoClient()
-    # Connect to Database
-    database = mongoclient["CryptoExchange"]
-    # Get collection
-    collection = database["binance"]
-    # Get unique values
-    outcome = collection.distinct("symbol")
-    return outcome

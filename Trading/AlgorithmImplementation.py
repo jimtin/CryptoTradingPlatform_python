@@ -3,16 +3,17 @@ from TradingAlgorithms import algorithmone
 from databasing import mongodb
 from binance import binancedatasearching
 from timeit import default_timer as timer
+from Trading import TradingFunctions
 import logging
 
 # Library to implement trading algorithms
 
 # Implment algorithm one
 def implementalgorithmone(Tolerance=2):
+    print("Starting algorithm one")
     # Algorithm one is a moving average analysis
     # Start the timer on the algorithm
     start = timer()
-    print(start)
     # Set up the logger
     logging.basicConfig(format='%(asctime)s - %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S',
                         level=logging.INFO, filename='app.log', filemode='a')
@@ -27,6 +28,10 @@ def implementalgorithmone(Tolerance=2):
         # Now run this data through algorithm one
         outcome = algorithmone.algorithmone(tokendata, Tolerance)
         recordrecommendation(outcome)
+        # if recommendation is to purchase, pass to function to do so
+        if outcome["Recommendation"] == "Buy":
+            TradingFunctions.purchasetoken(Token=token, Exchange="coinbase")
+
     ############ Binance ############
     # For Binance, given the much greater efficacacy of data, will need to take a different approach
     # Get a list of unique binance tokens available to search
@@ -43,9 +48,14 @@ def implementalgorithmone(Tolerance=2):
         outcome = algorithmone.algorithmone(tokendata, Tolerance)
         # Record the recommendation
         recordrecommendation(outcome)
+        # If recommendation is to purchase, pass to function to do so
+        if outcome["Recommendation"] == "Buy":
+            TradingFunctions.purchasetoken(Token=token, Exchange="binance")
+
 
     end = timer()
     timetaken = end - start
+    print(timetaken/60)
     totaltokens = coinbasenum + binancenum
     logging.info(f'Algorithm one completed on {totaltokens} tokens, total time taken (in seconds): {timetaken}')
 
@@ -53,3 +63,11 @@ def implementalgorithmone(Tolerance=2):
 def recordrecommendation(Data):
     record = mongodb.insertsingleintotradingrecommendations(Data)
     return record
+
+# Maintain a list of the algorithms available, this will allow multithreading to take place
+def listofalgorithms():
+    algorithmlist = [{
+        "Algorithm": "AlgorithmOne",
+        "Path": "AlgorithmImplementation.implementalgorithmone()"
+    }]
+    return algorithmlist

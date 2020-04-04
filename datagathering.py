@@ -1,26 +1,20 @@
-import pyfiglet # For a bit of fun :)
 from binance import binanceAPIlibrary
 from coinbase import coinbaselibrary
 
 
-# Get file path for keys
-def main():
-    # Create welcome banner for a bit of fun :)
-    welcome_banner = pyfiglet.figlet_format("Welcome to CryptoTrading Library")
-    print(welcome_banner)
-
+# function to get data from exchanges and put in MongoDB
+def getexchangedata():
     while 1:
-    # Get data from exchanges
-        print("Getting binance prices")
+        # Get data from binance
         binanceAPIlibrary.getpricechanges()
-
-        print("Getting coinbase spot prices")
+        # Instantiate the currently supported list of data from coinbase
         coinbaselist = ["BTC-USD", "ETH-USD", "XRP-USD", "BCH-USD", "BSV-USD", "LTC-USD", "EOS-USD", "XTZ-USD", "XLM-USD",
                         "LINK-USD", "DASH-USD", "ETC-USD", "ATOM-USD", "ZEC-USD", "BAT-USD", "ZRX-USD", "REP-USD",
                         "KNC-USD",
                         "DAI-USD"]
-        coinbasespotprices = coinbaselibrary.getlistfromcoinbase(coinbaselist)
-
-main()
+        # Get data from coinbase
+        coinbaselibrary.getlistfromcoinbase(coinbaselist)
+        # Update myself while troubleshooting
+        print("Round complete, starting new round")
 
 
