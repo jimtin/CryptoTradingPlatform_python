@@ -9,8 +9,8 @@ import logging
 # Library to implement trading algorithms
 
 # Implment algorithm one
-def implementalgorithmone(Tolerance=2):
-    print("Starting algorithm one")
+def implementalgorithmone(Tolerance):
+    print("Starting")
     # Algorithm one is a moving average analysis
     # Start the timer on the algorithm
     start = timer()
@@ -51,23 +51,28 @@ def implementalgorithmone(Tolerance=2):
         # If recommendation is to purchase, pass to function to do so
         if outcome["Recommendation"] == "Buy":
             TradingFunctions.purchasetoken(Token=token, Exchange="binance")
-
-
+    # Capture the end of the function
     end = timer()
+    # Calculate the time taken
     timetaken = end - start
-    print(timetaken/60)
+    # Turn into minutes
+    minutes = timetaken
+    # Calculate the total number of coins analysed
     totaltokens = coinbasenum + binancenum
+    # Average seconds per token
+    avg = timetaken/totaltokens
     logging.info(f'Algorithm one completed on {totaltokens} tokens, total time taken (in seconds): {timetaken}')
+    statement = f'Algorithm one completed on {totaltokens} tokens in {minutes}. Average of {avg} seconds per token'
+    print(statement)
 
 # Insert the trading recommendation into Database collection
 def recordrecommendation(Data):
     record = mongodb.insertsingleintotradingrecommendations(Data)
     return record
 
-# Maintain a list of the algorithms available, this will allow multithreading to take place
-def listofalgorithms():
-    algorithmlist = [{
-        "Algorithm": "AlgorithmOne",
-        "Path": "AlgorithmImplementation.implementalgorithmone()"
-    }]
-    return algorithmlist
+# Function to keep interating through a list of algorithms
+def iteralgorithms(Tolerance=2, Start=False):
+    while Start==True:
+        print("Running algorithm one")
+        implementalgorithmone(Tolerance, Start)
+

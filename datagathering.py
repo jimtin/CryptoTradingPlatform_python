@@ -3,8 +3,9 @@ from coinbase import coinbaselibrary
 
 
 # function to get data from exchanges and put in MongoDB
-def getexchangedata():
-    while 1:
+def getexchangedata(Start=False):
+    print("Starting data gathering")
+    while Start==True:
         # Get data from binance
         binanceAPIlibrary.getpricechanges()
         # Instantiate the currently supported list of data from coinbase
