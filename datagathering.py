@@ -16,6 +16,6 @@ def getexchangedata(Start=False):
         # Get data from coinbase
         coinbaselibrary.getlistfromcoinbase(coinbaselist)
         # Update myself while troubleshooting
-        print("Round complete, starting new round")
+        print("Datagathering round completed, starting new round")
 
 
