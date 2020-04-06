@@ -7,8 +7,8 @@ import logging
 # the following hour.
 # User inputs tolerance. Default is 2%
 
-# Function to take a Dataframe for a token and determine percentage rise for past four hours
-def algorithmone(TokenDataFrame, Tolerance=2):
+# Function to take a Dataframe for a token and determine percentage rise for past four hours. If meets tolerance, buy is recommended.
+def algorithmonebuy(TokenDataFrame, Tolerance=2):
     # Set up the logging for this algorithm
     logging.basicConfig(format='%(asctime)s - %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO, filename='app.log', filemode='a')
     # Get the name of the token being analysed

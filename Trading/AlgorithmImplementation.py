@@ -5,6 +5,7 @@ from binance import binancedatasearching
 from timeit import default_timer as timer
 from Trading import TradingFunctions
 import logging
+import time
 
 # Library to implement trading algorithms
 
@@ -26,7 +27,7 @@ def implementalgorithmone(Tolerance):
         # First get the data for each token
         tokendata = coinbasedatasearching.gettimeframecoinbasetoken(Token=token, TimeFrame=4)
         # Now run this data through algorithm one
-        outcome = algorithmone.algorithmone(tokendata, Tolerance)
+        outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         recordrecommendation(outcome)
         # if recommendation is to purchase, pass to function to do so
         if outcome["Recommendation"] == "Buy":
@@ -46,7 +47,7 @@ def implementalgorithmone(Tolerance):
         # Slice binance data into a smaller chunk
         tokendata = binancedata[binancedata.Token.eq(token)]
         # Now analyse smaller dataframe
-        outcome = algorithmone.algorithmone(tokendata, Tolerance)
+        outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         # Record the recommendation
         recordrecommendation(outcome)
         # If recommendation is to purchase, pass to function to do so
@@ -74,6 +75,10 @@ def recordrecommendation(Data):
 # Function to keep interating through a list of algorithms
 def iteralgorithms(Tolerance=2, Start=False):
     while Start==True:
-        print("Running algorithm one")
-        implementalgorithmone(Tolerance)
+        try:
+            print("Running algorithm one")
+            implementalgorithmone(Tolerance)
+        except:
+            print("Algorithm One error observed")
+            time.sleep(30)
 
