@@ -49,7 +49,7 @@ def implementalgorithmone(Tolerance):
         # Now analyse smaller dataframe
         outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         # Record the recommendation
-        recordrecommendation(outcome)
+        #recordrecommendation(outcome)
         # If recommendation is to purchase, pass to function to do so
         if outcome["Recommendation"] == "Buy":
             TradingFunctions.purchasetoken(Token=token, Exchange="binance")

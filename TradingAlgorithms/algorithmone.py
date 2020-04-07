@@ -17,11 +17,20 @@ def algorithmonebuy(TokenDataFrame, Tolerance=2):
     exchange = TokenDataFrame.tail(1).Exchange.values[0]
     # Group the DataFrame into hours
     TokenDataFrame = TokenDataFrame.groupby(TokenDataFrame.index.hour).mean()
+    # Set up outcome variable
+    resultdict = {
+        "DateTime": str(datetime.datetime.now()),
+        "Exchange": exchange,
+        "Token": tokenname,
+        "Recommendation": "",
+        "TradingAlgorithm": "algorithmone",
+        "Tolerance": Tolerance
+    }
     # Test the length of the DataFrame, make sure it is greater than 4, otherwise not enough data
     if len(TokenDataFrame.index) < 5:
         logging.info(f'{tokenname} did not have enough results')
-        outcome = "NotEnoughData"
-        return outcome
+        resultdict["Recommendation"] = "NotEnoughData"
+        return resultdict
     else:
         logging.info(f'{tokenname} getting analyzed, tolerance={Tolerance}')
         # Get percentage change of token per hour
@@ -34,20 +43,10 @@ def algorithmonebuy(TokenDataFrame, Tolerance=2):
         # See if they have risen by the tolerance
         if TwoHours.take([0]).MetTolerance.item() == "True":
             if TwoHours.take([0]).MetTolerance.item() == "True":
-                outcome = "Buy"
+                resultdict["Recommendation"] = "Buy"
             else:
-                outcome = "PartialBuy"
+                resultdict["Recommendation"] = "PartialBuy"
         else:
-            outcome = "NoBuy"
-
-        # Define the dictionary which will be returned by algorithm
-        resultdict = {
-            "DateTime": str(datetime.datetime.now()),
-            "Exchange": exchange,
-            "Token": tokenname,
-            "Recommendation": outcome,
-            "TradingAlgorithm": "algorithmone",
-            "Tolerance": Tolerance
-        }
+            resultdict["Recommendation"] = "NoBuy"
         return resultdict
 
