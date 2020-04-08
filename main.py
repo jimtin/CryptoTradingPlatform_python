@@ -2,7 +2,7 @@ import pyfiglet
 import datagathering
 from Trading import AlgorithmImplementation
 import multiprocessing
-from selfanalysis import selfanalysis
+from selfanalysis import dbanalysisclass
 
 
 # Main function for CryptoTrading platform
@@ -29,6 +29,6 @@ if __name__ == "__main__":
 # Function to make sure database is up and running properly
 def makesuredbisworking(Database):
     # Create the self analysis object
-    analysisobject = selfanalysis.selfanalysis(Database)
+    analysisobject = dbanalysisclass.selfanalysis(Database)
     # Check the database is running, if not restart
     analysisobject.checkandrestartdatabase()

@@ -1,6 +1,7 @@
 from binance import binanceAPIlibrary
 from coinbase import coinbaselibrary
 from timeit import default_timer as timer
+from selfanalysis import logginglibrary
 import time
 
 
@@ -35,7 +36,7 @@ def getexchangedata(Start=False):
         end = timer()
         # Calculate time in seconds of execution
         executetime = end - start
-        # Update myself while troubleshooting
-        print(f"Datagathering round completed in {executetime} seconds, starting new round")
+        # Log the length of time it has taken
+        logginglibrary.logfunctiontime("getexchangedata", executetime)
 
 

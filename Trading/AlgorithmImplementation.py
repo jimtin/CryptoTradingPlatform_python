@@ -4,7 +4,7 @@ from databasing import mongodb
 from binance import binancedatasearching
 from timeit import default_timer as timer
 from Trading import TradingFunctions
-import logging
+from selfanalysis import logginglibrary
 import time
 
 # Library to implement trading algorithms
@@ -14,10 +14,6 @@ def implementalgorithmone(Tolerance):
     # Algorithm one is a moving average analysis
     # Start the timer on the algorithm
     start = timer()
-    # Set up the logger
-    logging.basicConfig(format='%(asctime)s - %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S',
-                        level=logging.INFO, filename='app.log', filemode='a')
-    logging.info("Starting algorithm one")
     # Get a list of coinbase tokens
     coinbaselist = coinbasedatasearching.getuniquecoinbasetokens()
     coinbasenum = len(coinbaselist)
@@ -56,16 +52,11 @@ def implementalgorithmone(Tolerance):
     # Capture the end of the function
     end = timer()
     # Calculate the time taken
-    timetaken = end - start
-    # Turn into minutes
-    minutes = timetaken
+    executetime = end - start
     # Calculate the total number of coins analysed
     totaltokens = coinbasenum + binancenum
-    # Average seconds per token
-    avg = timetaken/totaltokens
-    logging.info(f'Algorithm one completed on {totaltokens} tokens, total time taken (in seconds): {timetaken}')
-    statement = f'Algorithm one completed on {totaltokens} tokens in {minutes}. Average of {avg} seconds per token'
-    print(statement)
+    logginglibrary.logalgorithmselfanalysisevents("AlgorithmOne", executetime, totaltokens)
+
 
 # Insert the trading recommendation into Database collection
 def recordrecommendation(Data):
