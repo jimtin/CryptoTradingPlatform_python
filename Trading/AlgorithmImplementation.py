@@ -55,7 +55,7 @@ def implementalgorithmone(Tolerance):
     executetime = end - start
     # Calculate the total number of coins analysed
     totaltokens = coinbasenum + binancenum
-    logginglibrary.logalgorithmselfanalysisevents("AlgorithmOne", executetime, totaltokens)
+    logginglibrary.logalgorithmselfanalysisevents("AlgorithmOne", executetime, totaltokens, "implementalgorithmone")
 
 
 # Insert the trading recommendation into Database collection

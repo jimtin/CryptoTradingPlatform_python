@@ -1,20 +1,30 @@
 import platform
 import os
 from pymongo import MongoClient
+import subprocess
+
+# Database class
+class Database:
+    def __init__(self, Database):
+        self.dbname = Database
+        client = MongoClient()
+        db = client[self.dbname]
+        self.dbconnection = db
 
 # Class to run self analysis on CryptoTrading platform
-class dbanalysis:
-    def __init__(self, database):
+class dbanalysis(Database):
+    def __init__(self, Database):
+        super().__init__(Database)
         # Get the platform program is running on
         self.Platform = platform.system()
         # Set the name of the exchange database being used
-        self.Database = database
+        self.Database = Database
         if self.Platform == 'Linux':
             # Check the status of the database service
-            self.DatabaseStatus = os.system('service mongod status')
+            proc = subprocess.run(["service", "mongod", "status"], stdout=subprocess.PIPE, shell=False)
+            self.DatabaseStatus = proc.returncode
             # If status not 0, means there is an issue and should be addressed. If 0, means it is running
             if self.DatabaseStatus == 0:
-                print("Database service mongod is running")
                 # If all is up and running, get stats about the database
                 # Set up MongoClient
                 client = MongoClient()

@@ -29,12 +29,13 @@ def logfunctiontime(Function, TimeTaken):
     logging(functionobject, "selfanalysis")
 
 # Wrapper to log algorithm events
-def logalgorithmselfanalysisevents(Algorithm, TimeTaken, NumberofTokens):
+def logalgorithmselfanalysisevents(Algorithm, TimeTaken, NumberofTokens, Function):
     # Create the Python Object to be inserted into the database
     algorithmobject = {
         "Algorithm": Algorithm,
         "TimeTaken": TimeTaken,
         "NumberofTokens": NumberofTokens,
+        "Function": Function,
         "DateTime": str(datetime.datetime.now())
     }
     logging(algorithmobject, "selfanalysis")

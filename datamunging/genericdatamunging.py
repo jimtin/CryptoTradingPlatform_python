@@ -2,7 +2,7 @@ from databasing import mongodb
 import pandas
 from timeit import default_timer as timer
 
-# Library to convert data from various exchanges into a single coherent datatype. Output should always be a dataframe
+# Library to convert data from various queries into a coherent datatypes. Output should always be a dataframe
 
 # Get coinbase dataframe and munge into a consistent set of fields
 def getlastcoinbasepricedata(Query):
@@ -75,5 +75,4 @@ def getlastbinancepricedata(Query):
     totaltime = end-start
     # print(totaltime)
     return df
-
 
