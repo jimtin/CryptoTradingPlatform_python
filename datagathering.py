@@ -7,7 +7,6 @@ import time
 
 # function to get data from exchanges and put in MongoDB
 def getexchangedata(Start=False):
-    print("Starting data gathering")
     while Start==True:
         # Time the function to see how long it takes to execute
         start = timer()

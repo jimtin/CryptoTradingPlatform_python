@@ -17,7 +17,6 @@ def implementalgorithmone(Tolerance):
     # Get a list of coinbase tokens
     coinbaselist = coinbasedatasearching.getuniquecoinbasetokens()
     coinbasenum = len(coinbaselist)
-    print("Getting coinbase data")
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in coinbaselist:
         # First get the data for each token
@@ -35,7 +34,6 @@ def implementalgorithmone(Tolerance):
     binancelist = binancedatasearching.getuniquebinancetokens()
     # Get the lenght of this list to analyze efficiency of search
     binancenum = len(binancelist)
-    print("Getting binance data")
     # Now get a dataframe of ALL binance data from past four hours
     binancedata = binancedatasearching.gettimeframealltokens(4)
     # For each token in the list of coinbase tokens, run through algorithm one
@@ -67,7 +65,6 @@ def recordrecommendation(Data):
 def iteralgorithms(Tolerance=2, Start=False):
     while Start==True:
         try:
-            print("Running algorithm one")
             implementalgorithmone(Tolerance)
         except:
             print("Algorithm One error observed")

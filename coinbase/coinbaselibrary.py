@@ -54,9 +54,7 @@ def combinespotprices():
 
 # Function to get a list of Coinbase currencies
 def getlistfromcoinbase(list):
-    logging.basicConfig(filename="app.log", filemode="a", format='%(asctime)s - %(process)d - %(message)s', level=logging.INFO)
     spotprices = []
-    logging.info(f"Getting the list of tokens: {spotprices}")
     for currencypair in list:
         # logging.info(f"Getting token {token}")
         # Get currency pair from coinbase
@@ -69,6 +67,5 @@ def getlistfromcoinbase(list):
         # Coinbase has an API limit of 3 requests per second
         sleep(0.5)
     # When completed append to the collection coinbase in mongo
-    logging.info("Inserting coinbase results into mongodb")
     outcome = mongodb.insertmanyintocrypto("coinbase", spotprices)
     return outcome
