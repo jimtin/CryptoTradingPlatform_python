@@ -5,7 +5,7 @@ from timeit import default_timer as timer
 # Library to convert data from various queries into a coherent datatypes. Output should always be a dataframe
 
 # Get coinbase dataframe and munge into a consistent set of fields
-def getlastcoinbasepricedata(Query):
+def getcoinbasepricedata(Query):
     result = mongodb.getcoinbasequerydata(Query)
     df = pandas.DataFrame(result)
     # Convert column 'base' into a string, then rename to token

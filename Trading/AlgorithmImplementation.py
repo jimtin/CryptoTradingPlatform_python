@@ -20,7 +20,7 @@ def implementalgorithmone(Tolerance):
     # For each token in the list of coinbase tokens, run through algorithm one
     for token in coinbaselist:
         # First get the data for each token
-        tokendata = coinbasedatasearching.gettimeframecoinbasetoken(Token=token, TimeFrame=4)
+        tokendata = coinbasedatasearching.getlatestcoinbasetoken(Token=token, TimeFrame=4)
         # Now run this data through algorithm one
         outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         recordrecommendation(outcome)
@@ -40,7 +40,7 @@ def implementalgorithmone(Tolerance):
         # Now analyse smaller dataframe
         outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         # Record the recommendation
-        #recordrecommendation(outcome)
+        recordrecommendation(outcome)
         # If recommendation is to purchase, pass to function to do so
         if outcome["Recommendation"] == "Buy":
             TradingFunctions.purchasetoken(Token=token, Exchange="binance")
@@ -68,3 +68,5 @@ def iteralgorithms(Tolerance=0.5, Start=False):
             time.sleep(30)
 
 # Function to wargame algorithm one
+# Desire is to take algorithm one and run over historical data. Over time this will allow for more efficient and effective trading
+
