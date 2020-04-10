@@ -24,9 +24,6 @@ def implementalgorithmone(Tolerance):
         # Now run this data through algorithm one
         outcome = algorithmone.algorithmonebuy(tokendata, Tolerance)
         recordrecommendation(outcome)
-        # if recommendation is to purchase, pass to function to do so
-        if outcome["Recommendation"] == "Buy":
-            TradingFunctions.purchasetoken(Token=token, Exchange="coinbase")
 
     ############ Binance ############
     # For Binance, given the much greater efficacacy of data, will need to take a different approach
@@ -62,7 +59,7 @@ def recordrecommendation(Data):
     return record
 
 # Function to keep interating through a list of algorithms
-def iteralgorithms(Tolerance=2, Start=False):
+def iteralgorithms(Tolerance=0.5, Start=False):
     while Start==True:
         try:
             implementalgorithmone(Tolerance)
@@ -70,3 +67,4 @@ def iteralgorithms(Tolerance=2, Start=False):
             print("Algorithm One error observed")
             time.sleep(30)
 
+# Function to wargame algorithm one
