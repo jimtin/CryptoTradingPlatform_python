@@ -109,6 +109,6 @@ def testcoinbasealgorithmonetolearnaces(Token, InvestmentAmount):
     # todo: iterate in 0.1% amounts plus / minus
     # Potential considerations:
     # 1. Symmetrical vs non-symmetrical limits. i.e. if it rises by 1% should the exit also be 1%
-    # 2. Amounts. Should all of the Investment Amount be invested, or is the risk lowered if the amount is decreased? 
+    # 2. Amounts. Should all of the Investment Amount be invested, or is the risk lowered if the amount is decreased?
     return hours
 
