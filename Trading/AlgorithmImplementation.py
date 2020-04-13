@@ -6,6 +6,8 @@ from timeit import default_timer as timer
 from Trading import TradingFunctions
 from selfanalysis import logginglibrary
 import time
+from datamunging import genericdatamunging
+import pandas
 
 # Library to implement trading algorithms
 
@@ -69,4 +71,41 @@ def iteralgorithms(Tolerance=0.5, Start=False):
 
 # Function to wargame algorithm one
 # Desire is to take algorithm one and run over historical data. Over time this will allow for more efficient and effective trading
+def testcoinbasealgorithmonetolearnaces(Token, InvestmentAmount):
+    # Start a timer on the function so it can be measured
+    start = timer()
+    # Get all the entries for a single coinbase Token
+    # First construct the query to be passed
+    query = {'base': Token}
+    # Query database
+    TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)
+    # Get the start time of data
+    startime = TokenDataFrame.head(1).index.values[0]
+    # Get the stop time of the data
+    stoptime = TokenDataFrame.tail(1).index.values[0]
+    # Get the time range this will be over
+    timerange = int(stoptime - startime)
+    # Get a range of different time slices for future use
+    seconds = timerange/1e9
+    minutes = timerange/(1e9*60)
+    hours = timerange/(1e9 * 60 * 60)
+    days = timerange/(1e9 * 60 * 60 * 24)
+    # Define what success is
+    # Get start price
+    startprice = TokenDataFrame.head(1).Price.values[0]
+    # Get end price
+    endprice = TokenDataFrame.tail(1).Price.values[0]
+    # Get the delta
+    change = endprice - startprice
+    # Calculate the number of units which would have been bought with the investment amount
+    numunits = InvestmentAmount/startprice
+    # Multiply this against the change
+    successcriteria = numunits * change
+    print(f'Success Amount to beat is: ${successcriteria}')
+    # todo: calculate when to sell a stock based upon a tolerance
+    # todo: combine the two calculations together to see if I can 'buy' and 'sell' based upon criteria
+    # todo: store the outcomes into separate database
+    # todo: using this, iterate through entire list of tokens and develop custom trading amounts for each token
+    # todo: iterate in 0.1% amounts plus / minus
+    return hours
 
