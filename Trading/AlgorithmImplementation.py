@@ -8,6 +8,7 @@ from selfanalysis import logginglibrary
 import time
 from datamunging import genericdatamunging
 import pandas
+import numpy
 
 # Library to implement trading algorithms
 
@@ -82,9 +83,9 @@ def testcoinbasealgorithmonetolearnaces(Token, InvestmentAmount):
     # Get the start time of data
     startime = TokenDataFrame.head(1).index.values[0]
     # Get the stop time of the data
-    stoptime = TokenDataFrame.tail(1).index.values[0]
+    endtime = TokenDataFrame.tail(1).index.values[0]
     # Get the time range this will be over
-    timerange = int(stoptime - startime)
+    timerange = int(endtime - startime)
     # Get a range of different time slices for future use
     seconds = timerange/1e9
     minutes = timerange/(1e9*60)
@@ -102,7 +103,34 @@ def testcoinbasealgorithmonetolearnaces(Token, InvestmentAmount):
     # Multiply this against the change
     successcriteria = numunits * change
     print(f'Success Amount to beat is: ${successcriteria}')
-    # todo: calculate when to sell a stock based upon a tolerance
+    # Set up a list to store outcomes while testing
+    analysisresults = []
+    # Set up a for loop to iterate through dataframe using 1 minute intervals
+    # First calculate the maximum value. This will 5 hours less than the end time
+    stoptime = endtime - numpy.timedelta64(5, 'h')
+    dfstarttime = startime
+    while dfstarttime < stoptime:
+        # Using dfstarttime, get the end time. This will be five hours from start time
+        dfendtime = dfstarttime + numpy.timedelta64(5, 'h')
+        # To confirm my sanity, print the start and end times
+        # Now select a five hour window from DataFrame
+        # First transform dfstarttime and dfendtime into strings
+        dfstarttimestring = str(dfstarttime)
+        dfendtimestring = str(dfendtime)
+        # Select the slice of the Dataframe, store in a separate dataframe. Have wrapped in a try statement while I deal with not enough data errors
+        try:
+            analysisdf = TokenDataFrame.loc[dfstarttimestring:dfendtimestring]
+            # Run through algorithm. Tolerance hardcoded in while exploring data
+            outcome = algorithmone.algorithmonebuy(analysisdf, Tolerance=0.1)
+            if outcome["Recommendation"] == "Buy":
+                print(outcome["Recommendation"])
+            # Store results
+            analysisresults.append(outcome)
+        except:
+            error = "Error"
+        # Now add one minute to dfstarttime
+        dfstarttime = dfstarttime + numpy.timedelta64(1, 'm')
+
     # todo: combine the two calculations together to see if I can 'buy' and 'sell' based upon criteria
     # todo: store the outcomes into separate database
     # todo: using this, iterate through entire list of tokens and develop custom trading amounts for each token
@@ -110,5 +138,16 @@ def testcoinbasealgorithmonetolearnaces(Token, InvestmentAmount):
     # Potential considerations:
     # 1. Symmetrical vs non-symmetrical limits. i.e. if it rises by 1% should the exit also be 1%
     # 2. Amounts. Should all of the Investment Amount be invested, or is the risk lowered if the amount is decreased?
-    return hours
+    end = timer()
+    timetaken = end - start
+    print(f"Time taken on algorithm was {timetaken}")
+    return analysisresults
 
+# Function to pass all coinbase tokens through coinbase algorithm testing
+def testallcoinbasetokens():
+    # Get a list of coinbase tokens
+    coinbaselist = coinbasedatasearching.getuniquecoinbasetokens()
+    coinbasenum = len(coinbaselist)
+    for token in coinbaselist:
+        print(f'Now testing {token}')
+        result = testcoinbasealgorithmonetolearnaces(token, 10000)
