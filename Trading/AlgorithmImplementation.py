@@ -151,7 +151,11 @@ def testallcoinbasetokens():
     coinbaselist = coinbasedatasearching.getuniquecoinbasetokens()
     for token in coinbaselist:
         print(f'Now testing {token}')
-        result = testcoinbasealgorithmone(token, 10000)
+        query = {'base': token}
+        # Get the token data
+        TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)
+        result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1, BuyTolerance=0.1)
+        print(result)
     # Finish timer on function
     end = timer()
     # Calculate the time taken
@@ -200,6 +204,8 @@ def testbinancealgorithmone(Token, InvestmentAmount):
             analysisdf = TokenDataFrame.loc[dfstarttimestring:dfendtimestring]
             # Run algorithmonebuy. Tolerance hardcoded in while data exploration occuring
             outcome = algorithmone.algorithmonebuy(analysisdf, Tolerance=0.1)
+            # Create recommendation dictionary
+            print(outcome)
             if outcome["Recommendation"] == "Buy":
                 print((outcome["Recommendation"]))
             # Store result in list.
@@ -228,9 +234,144 @@ def testallbinancetokens():
     # Iterate through to get results
     for token in binancelist:
         print(f'Now testing {token}')
-        result = testbinancealgorithmone(token, 10000)
+        query = {'symbol': token}
+        # Get the token data
+        TokenDataFrame = genericdatamunging.getlastbinancepricedata(query)
+        result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1,
+                                  BuyTolerance=0.1)
+        print(result)
     end = timer()
     # Calculate the time taken on function
     timetaken = end - start
     # Notify the user
     print(f'Time taken was {timetaken} seconds on testallbinancetokens')
+
+
+# Create generic algorithm one test function. Assume TokenDataFrame has been passed through generic datamunging so data is consistent
+def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellTolerance):
+    # Start the timer on the function
+    start = timer()
+    # Create the results dictionary
+    result = {
+        "Token": "",
+        "InvestmentAmount": InvestmentAmount,
+        "BuyTolerance": BuyTolerance,
+        "SellTolerance": SellTolerance,
+        "HODLOutcome": 0,
+        "HoursAnalysed": 0,
+        "BuyRecommendations": 0,
+        "SellRecommendations": 0,
+        "AlgorithmCash": 0,
+        "ProfitLoss": 0,
+        "AlgorithmOutcome": "",
+    }
+    # Todo: implement multithreading on this
+    # Get the Token name, store in dictionary
+    tokenname = TokenDataFrame.tail(1).Token.values[0]
+    result["Token"] = tokenname
+    # Figure out what success would look like (HODL)
+    startprice = TokenDataFrame.head(1).Price.values[0]
+    endprice = TokenDataFrame.tail(1).Price.values[0]
+    pricechange = endprice - startprice
+    HODLOutcome = (pricechange * InvestmentAmount) + InvestmentAmount
+    result["HODLOutcome"] = HODLOutcome
+    # Get start and end times of TokenDataFrame
+    startime = TokenDataFrame.head(1).index.values[0]
+    stoptime = TokenDataFrame.tail(1).index.values[0]
+    # Get number of hours analysed (will assist with efficiency calculations later)
+    timerange = int(stoptime - startime)
+    hours = timerange / (1e9 * 60 * 60)
+    result["HoursAnalysed"] = hours
+    # Determine the time to stop iteration without getting out of range
+    endtime = stoptime - numpy.timedelta64(5, 'h')
+    # Clone startime variable to enable comparative operator
+    dfstartime = startime
+    # Set a variable to indicate if a buy or sell is required. All instances start with a buy recommendation
+    buyorsell = "buy"
+    # Set the initial buy at zero
+    numtokenspurchased = 0
+    # Setup the variable to record the number of buy recommendations
+    buyrecommendations = 0
+    # Setup the variable to record the number of sell recommendations
+    sellrecommendations = 0
+    # Set a variable to track cashonhand. Initially starts with the investment amount
+    cashonhand = InvestmentAmount
+    while dfstartime < endtime:
+        # Set the end time of this particular dataframe slice. This will be five hours.
+        dfendtime = dfstartime + numpy.timedelta64(5, 'h')
+        # Slice this from the DataFrame. Requires time to be in string format.
+        dfstartimestring = str(dfstartime)
+        dfendtimestring = str(dfendtime)
+        # Determine which algorithm to try based upon buy or sell
+        if buyorsell == "buy":
+            # Select the slice of the Dataframe, store in a separate dataframe. Have wrapped in a try statement while I deal with not enough data errors
+            try:
+                analysisdf = TokenDataFrame.loc[dfstartimestring:dfendtimestring]
+                # Run through algorithm.
+                outcome = algorithmone.algorithmonebuy(analysisdf, Tolerance=BuyTolerance)
+                if outcome["Recommendation"] == "Buy":
+                    buyrecommendations = buyrecommendations + 1
+                    # Token will be purchased at the end price of DataFrame
+                    purchaseprice = analysisdf.tail(1).Price.values[0]
+                    # Update number of tokens purchased
+                    numtokenspurchased = cashonhand / purchaseprice
+                    # Cash on hand will be set to zero, so do this
+                    cashonhand = 0
+                    # Next action will be to sell these tokens, so change variable
+                    buyorsell = "sell"
+            except:
+                # todo: turn this into a non silent error handle
+                error = "Error"
+        elif buyorsell == "sell":
+            # Select the slice of the Dataframe, store in a separate dataframe. Have wrapped in a try statement while I deal with not enough data errors
+            try:
+                analysisdf = TokenDataFrame.loc[dfstartimestring:dfendtimestring]
+                # Run through algorithm.
+                outcome = algorithmone.algorithmonesell(analysisdf, Tolerance=SellTolerance)
+                if outcome["Recommendation"] == "Sell":
+                    buyrecommendations = sellrecommendations + 1
+                    # Token will be sold at the end price of DataFrame
+                    sellprice = analysisdf.tail(1).Price.values[0]
+                    # Calculate the cash generated from sale
+                    cashonhand = numtokenspurchased * sellprice
+                    # Set number of tokens back to zero
+                    numtokenspurchased = 0
+                    # Next action will be to buy so change variable
+                    buyorsell = "buy"
+            except:
+                # todo: turn this into a non silent error handle
+                error = "Error"
+        else:
+            # Some basic error handling
+            print("Wrong outcome passed to buy or sell variable in function testalgorithmone")
+        # Increment start time of algorithm
+        dfstartime = dfstartime + numpy.timedelta64(1, 'm')
+    # At the conclusion of the while loop, should have a number of results
+    # Update number of buy and sell recommendations made
+    result["BuyRecommendations"] = buyrecommendations
+    result["SellRecommendations"] = sellrecommendations
+    # If any units remaining, sell at final price to determine if algorithm was successful or not
+    if numtokenspurchased != 0:
+        # Get final sell price from TokenDataFrame
+        finalsellprice = TokenDataFrame.tail(1).Price.values[0]
+        # Sell and update cashonhand
+        cashonhand = numtokenspurchased * finalsellprice
+    # Update outcomes dictionary with cashonhand
+    result["AlgorithmCash"] = cashonhand
+    # Calculate total profit or loss amount
+    profitorloss = cashonhand - InvestmentAmount
+    result["ProfitLoss"] = profitorloss
+    # Assess if algorithm provided success or failure
+    if HODLOutcome > cashonhand:
+        result["AlgorithmOutcome"] = "Failure"
+    elif HODLOutcome < cashonhand:
+        result["AlgorithmOutcome"] = "Success"
+    elif HODLOutcome == cashonhand:
+        result["AlgorithmOutcome"] = "NoBenefit"
+    # Calculate the time taken on the algorithm
+    end = timer()
+    timetaken = end-start
+    result["SecondsTaken"] = timetaken
+    # Return outcome
+    return result
+
