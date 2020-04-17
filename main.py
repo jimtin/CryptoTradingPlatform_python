@@ -35,7 +35,12 @@ if __name__ == "__main__":
     # Now set up the Algorithm process
     algorithm = multiprocessing.Process(target=AlgorithmImplementation.iteralgorithms, args=(tolerance, True), name=algorithmname)
     jobs.append(algorithm)
-    algorithm.start()
+    # Don't start automatically
+    # algorithm.start()
+    # Set up the initial analyse all tokens algorithm as I continue to test it
+    analysealgorithm = multiprocessing.Process(target=AlgorithmImplementation.testallcoinbasetokens, args=(), name="AlgorithmOneWargame")
+    jobs.append(analysealgorithm)
+    analysealgorithm.start()
 
     runprogram = True
 

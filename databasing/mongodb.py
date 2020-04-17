@@ -43,6 +43,11 @@ def insertsingleintotradingrecommendations(Data):
     recommendation = insertsingledata("TradingDatabase", "RawRecommendations", Data)
     return recommendation
 
+# Wrapper for inserting into the AlgorithmOne wargaming function
+def insertsingleintoalgorithmonewargame(Data):
+    result = insertsingledata("AlgorithmOneWargaming", "TestingData", Data)
+    return result
+
 # Retrieve single row of data from mongodb
 def getsingleresult(Database, Collection):
     # Make sure Database is a string
@@ -135,3 +140,28 @@ def getuniquecoinbasetokens():
     # Get unique values
     outcome = collection.distinct("base")
     return outcome
+
+# Function to get result from AlgorithmOneWargaming database
+def getsingleresultfromAlgorithmOneWargamingdatabase():
+    # Create the client
+    mongoclient = MongoClient()
+    # Connect to the database
+    database = mongoclient["AlgorithmOneWargaming"]
+    # Connect to the collection
+    collection = database["TestingData"]
+    # Get the value
+    outcome = collection.find_one()
+    return outcome
+
+# Function to get the latest result from AlgorithmOneWargaming for specified key
+def getlatestresultfromAlgorithOneWargamingwithKey(Key):
+    # Set up the query
+    query = {'Key': Key}
+    # Set up the client, database and collection
+    mongoclient = MongoClient()
+    collection = mongoclient["AlgorithmOneWargaming"]["TestingData"]
+    outcome = collection.find(query).sort([("DateTime", -1)]).limit(1)
+    outcome = list(outcome)
+    return outcome
+
+
