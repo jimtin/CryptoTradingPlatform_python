@@ -26,57 +26,51 @@ def multiprocessalgorithonewargaming(CPUCores):
     numCPUs = CPUCores
     # Get the list of tokens to be analysed
     tokenlist = []
+    # Notify user what we're doing
+    print("Wargaming Algorithm One")
+    # Get a list coinbase tokens
     coinbaselist = AlgorithmImplementation.getallcoinbasetokens()
     # Create list of tuples for coinbase tokens
     for token in coinbaselist["UniqueCoinbaseTokens"]:
         tokentuple = (token, "coinbase")
         tokenlist.append(tokentuple)
+    # Get a list of binance tokens to analyse
     binancetokens = AlgorithmImplementation.getallbinancetokens()
     # Add a list of tuples for binance coins to the total tokens to be analysed
-    for token in binancetokens:
+    for token in binancetokens["UniqueBinanceTokens"]:
         tokentuple = (token, "binance")
         tokenlist.append(tokentuple)
-    print(f'{len(coinbaselist["UniqueCoinbaseTokens"])} tokens to be analysed')
+    # Give user some indication of the task which awaits.
+    print(f'{len(tokenlist)} tokens to be analysed')
     # Setup queues
     outputqueue = multiprocessing.Queue()
     processes = []
     i = 0
-    print(coinbaselist["UniqueCoinbaseTokens"])
-    processing = True
-    while processing == True:
-        if i < len(coinbaselist["UniqueCoinbaseTokens"]):
-            token = coinbaselist["UniqueCoinbaseTokens"][i]
-            if numCPUs > 0:
-                # Create the process to analyse the token
-                proc = multiprocessing.Process(target=analysetoken, args=(token, "coinbase", outputqueue), name=token)
-                # Add the process to processes list
-                processes.append(proc)
-                # Start the process
-                proc.start()
-                # Iterate to next token
-                i = i + 1
-                # Kill a CPU from processing
-                numCPUs = numCPUs - 1
-            else:
-                # Check to see if any processes are completed
-                msg = outputqueue.get()
-                if msg != None:
-                    for proc in processes:
-                        if proc.name == msg["Token"]:
-                            proc.terminate()
-                            numCPUs = numCPUs + 1
-                            print(f'Number of tokens analysed: {i}')
-                            tokensleft = 1
-                            print(f"Number of tokens left: ")
-                            # Get the time taken so far
-                            timesofar = timer()
-                            timetaken = timesofar - start
-                            # Calculate a rough average for what is left
-                            calc = ((timetaken - 70) / i) * tokensleft
-                            print(f'EstimatedTimeLeft is: {calc}')
+    totaltokens = len(tokenlist)
+    while i < len(tokenlist):
+        token = tokenlist[i][0]
+        exchange = tokenlist[i][1]
+        if numCPUs > 0:
+            # print(f'Next analysis target is Token: {token}, Exchange: {exchange}')
+            # Create the process to analyse the token
+            proc = multiprocessing.Process(target=analysetoken, args=(token, exchange, outputqueue), name=token)
+            # Add the process to processes list
+            processes.append(proc)
+            # Start the process
+            proc.start()
+            # Iterate to next token
+            i = i + 1
+            # Kill a CPU from processing
+            numCPUs = numCPUs - 1
         else:
-            for proc in processes:
-                print(proc.is_alive())
+            # Check to see if any processes are completed
+            msg = outputqueue.get()
+            if msg != None:
+                for proc in processes:
+                    if proc.name == msg["Token"]:
+                        proc.terminate()
+                        numCPUs = numCPUs + 1
+
 
     end = timer()
     timetaken = end-start
@@ -123,7 +117,7 @@ if __name__ == "__main__":
     # analysealgorithm = multiprocessing.Process(target=AlgorithmImplementation.testallcoinbasetokens, args=(), name="AlgorithmOneWargame")
     # jobs.append(analysealgorithm)
     # analysealgorithm.start()
-    multiprocessalgorithonewargaming(CPUCores)
+    # multiprocessalgorithonewargaming(CPUCores)
 
     runprogram = True
 
@@ -139,6 +133,8 @@ if __name__ == "__main__":
                 print(f'Process Name: {proc.name}')
                 print(f'Process Status: {proc.is_alive()}')
                 print(f'Process PID: {proc.pid}')
+        elif text == "wargamealgorithmone":
+            multiprocessalgorithonewargaming(CPUCores)
         elif text == 'stop algorithms':
             print("Stopping algorithms")
             algorithm.terminate()

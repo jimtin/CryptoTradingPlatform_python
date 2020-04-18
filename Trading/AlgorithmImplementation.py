@@ -113,7 +113,7 @@ def getallbinancetokens():
     # Put results in a dictionary for future analysis
     outcomedict = {
         "TimeTaken": timetaken,
-        "UniqueCoinbaseTokens": binancelist,
+        "UniqueBinanceTokens": binancelist,
         "NumberofTokens": numtokens
     }
     return outcomedict
@@ -210,10 +210,14 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
     result["Token"] = tokenname
     # Get the Exchange, store in dictionary
     tokenexchange = TokenDataFrame.tail(1).Exchange.values[0]
+    result["Exchange"] = tokenexchange
     # Figure out what success would look like (HODL)
     startprice = TokenDataFrame.head(1).Price.values[0]
+    result["TokenStartPrice"] = startprice
     endprice = TokenDataFrame.tail(1).Price.values[0]
+    result["TokenEndPrice"] = endprice
     pricechange = endprice - startprice
+    result["TokenPriceChange"] = pricechange
     HODLOutcome = (pricechange * InvestmentAmount) + InvestmentAmount
     result["HODLOutcome"] = HODLOutcome
     # Get start and end times of TokenDataFrame
@@ -270,7 +274,7 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
                 # Run through algorithm.
                 outcome = algorithmone.algorithmonesell(analysisdf, Tolerance=SellTolerance)
                 if outcome["Recommendation"] == "Sell":
-                    buyrecommendations = sellrecommendations + 1
+                    sellrecommendations = sellrecommendations + 1
                     # Token will be sold at the end price of DataFrame
                     sellprice = analysisdf.tail(1).Price.values[0]
                     # Calculate the cash generated from sale
@@ -352,6 +356,7 @@ def testtoken(Token, Exchange):
 
     # Pass returned dataframe to be analysed
     result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1, BuyTolerance=0.1)
+    outcomedict["result"] = result
     # Insert result into mongodb
     mongodb.insertsingleintoalgorithmonewargame(result)
     # Update outcome
