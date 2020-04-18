@@ -18,8 +18,6 @@ Note this work does not contribute financial advice, it is simply my own analysi
 - Basic command line interface created, although it needs heaps more work
 
 ## What is up next?
-1. Implementation of confirmation analysis. I.e. are these trading recommendations historically more effective than HODLing?
-2. Dynamic parallelization of analysis
 3. Integration with the GolemProject for massive parallelization of the algorithm checking. This is particularly intersting with the Golem TaskAPI: https://taskapi.docs.golem.network/#task-api
 4. Implementation of more algorithms
 5. Turn into a self contained binary for ease of use
