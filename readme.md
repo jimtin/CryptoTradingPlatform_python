@@ -18,9 +18,9 @@ Note this work does not contribute financial advice, it is simply my own analysi
 - Basic command line interface created, although it needs heaps more work
 
 ## What is up next?
-3. Integration with the GolemProject for massive parallelization of the algorithm checking. This is particularly intersting with the Golem TaskAPI: https://taskapi.docs.golem.network/#task-api
-4. Implementation of more algorithms
-5. Turn into a self contained binary for ease of use
+1. Integration with the GolemProject for massive parallelization of the algorithm checking. This is particularly intersting with the Golem TaskAPI: https://taskapi.docs.golem.network/#task-api
+2. Implementation of more algorithms
+3. Turn into a self contained binary for ease of use
 
 ## What is Algorithm One
 - Hypothesis: If the price of a token _in any currency_ rises by more than a specified value for two hours, it will rise in the third hour
