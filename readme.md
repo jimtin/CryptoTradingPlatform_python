@@ -8,6 +8,7 @@ Note this work does not contribute financial advice, it is simply my own analysi
 - Python 3.8 or above
 - MongoDb installed and working
 - Working knowledge of python
+- Strongly recommend at least an i5 or equivalent processor and 16Gb RAM
 
 ## What it does so far
 - Gathers data from binance and coinbase using their publically available REST API
