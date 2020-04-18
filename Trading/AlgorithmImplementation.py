@@ -337,7 +337,7 @@ def testtoken(Token, Exchange):
         "Exchange": Exchange
     }
     # Get the token being assessed
-    print(f'Now testing {Token} from {Exchange}')
+    # print(f'Now testing {Token} from {Exchange}')
     if Exchange == 'coinbase':
         query = {'base': Token}
         TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)

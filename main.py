@@ -48,10 +48,18 @@ def multiprocessalgorithonewargaming(CPUCores):
     i = 0
     totaltokens = len(tokenlist)
     while i < len(tokenlist):
-        token = tokenlist[i][0]
-        exchange = tokenlist[i][1]
         if numCPUs > 0:
-            # print(f'Next analysis target is Token: {token}, Exchange: {exchange}')
+            token = tokenlist[i][0]
+            exchange = tokenlist[i][1]
+            # Get the number of remaining tokens
+            remainingtokens = totaltokens - i
+            if i > 4:
+                # Small estimate on time remaining
+                timesofar = timer()
+                timetakensofar = (timesofar - 75) / i
+                timeremaining = remainingtokens * timetakensofar
+                print(
+                    f'Analysing {token} from {exchange}. {i} tokens analysed, {remainingtokens} remain. Average time per token is {timetakensofar}, estimated time remaining is {timeremaining}')
             # Create the process to analyse the token
             proc = multiprocessing.Process(target=analysetoken, args=(token, exchange, outputqueue), name=token)
             # Add the process to processes list
