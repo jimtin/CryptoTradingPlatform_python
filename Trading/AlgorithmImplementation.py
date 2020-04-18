@@ -98,6 +98,27 @@ def getallcoinbasetokens():
     return outcomedict
 
 
+# Function to get a list of all the binance tokens
+def getallbinancetokens():
+    # Start timer on function
+    start = timer()
+    # Get a list of coinbase tokens
+    binancelist = binancedatasearching.getuniquebinancetokens()
+    # Get a count of the number of tokens
+    numtokens = len(binancelist)
+    # Finish timer
+    end = timer()
+    # Calculate time taken
+    timetaken = end - start
+    # Put results in a dictionary for future analysis
+    outcomedict = {
+        "TimeTaken": timetaken,
+        "UniqueCoinbaseTokens": binancelist,
+        "NumberofTokens": numtokens
+    }
+    return outcomedict
+
+
 # Function to pass all coinbase tokens through coinbase algorithm testing
 def testallcoinbasetokens():
     # Start timer on function
@@ -295,3 +316,49 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
     # Return outcome
     return result
 
+
+# Fuction designed for use with MultiProcessor class
+def testtoken(Token, Exchange):
+    # Start timer on function
+    start = timer()
+    # Setup outcome dictionary for algorithm
+    outcomedict = {
+        "HoursAssessed": 576,
+        "TimeTaken": 0,
+        "Key": "testtoken",
+        "DatabaseSearchTime": 0,
+        "DateTime": str(datetime.datetime.now()),
+        "Outcome": "",
+        "Token": Token,
+        "Exchange": Exchange
+    }
+    # Get the token being assessed
+    print(f'Now testing {Token} from {Exchange}')
+    if Exchange == 'coinbase':
+        query = {'base': Token}
+        TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)
+        outcomedict["Outcome"] = "TokenSearched"
+    elif Exchange == 'binance':
+        query = {"symbol": Token}
+        TokenDataFrame = genericdatamunging.getlastbinancepricedata(query)
+        outcomedict["Outcome"] = "TokenSearched"
+    else:
+        outcomedict["Outcome"] = "SearchFailed"
+        return outcomedict
+
+    dbsearchtime = timer()
+    timetaken = dbsearchtime - start
+    outcomedict["DatabaseSearchTime"] = timetaken
+
+    # Pass returned dataframe to be analysed
+    result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1, BuyTolerance=0.1)
+    # Insert result into mongodb
+    mongodb.insertsingleintoalgorithmonewargame(result)
+    # Update outcome
+    outcomedict["Outcome"] = "TokenAnalysed"
+    totaltime = timer()
+    timetaken = totaltime - start
+    outcomedict["TimeTaken"] = timetaken
+    # Insert into mongodb
+    mongodb.insertsingleintoalgorithmonewargame(outcomedict)
+    return outcomedict
