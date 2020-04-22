@@ -10,6 +10,7 @@ from datamunging import genericdatamunging
 import pandas
 import numpy
 import datetime
+import sys
 
 # Library to implement trading algorithms
 
@@ -202,9 +203,9 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
         "ProfitLoss": 0,
         "AlgorithmOutcome": "",
         "Key": "testalgorithmone",
-        "DateTime": str(datetime.datetime.now())
+        "DateTime": str(datetime.datetime.now()),
+        "IndexError": 0
     }
-    # Todo: implement multithreading on this
     # Get the Token name, store in dictionary
     tokenname = TokenDataFrame.tail(1).Token.values[0]
     result["Token"] = tokenname
@@ -264,9 +265,10 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
                     cashonhand = 0
                     # Next action will be to sell these tokens, so change variable
                     buyorsell = "sell"
+            except IndexError:
+                result["IndexError"] = result["IndexError"] + 1
             except:
-                # todo: turn this into a non silent error handle
-                error = "Error"
+                print(f"Unexpected error in testalgorithm one function: {sys.exc_info()[0]}")
         elif buyorsell == "sell":
             # Select the slice of the Dataframe, store in a separate dataframe. Have wrapped in a try statement while I deal with not enough data errors
             try:
@@ -283,9 +285,10 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
                     numtokenspurchased = 0
                     # Next action will be to buy so change variable
                     buyorsell = "buy"
+            except IndexError:
+                result["IndexError"] = result["IndexError"] + 1
             except:
-                # todo: turn this into a non silent error handle
-                error = "Error"
+                print(f"Unexpected error in testalgorithm one function:: {sys.exc_info()[0]}")
         else:
             # Some basic error handling
             print("Wrong outcome passed to buy or sell variable in function testalgorithmone")
@@ -322,7 +325,7 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
 
 
 # Fuction designed for use with MultiProcessor class
-def testtoken(Token, Exchange):
+def testtoken(Token, Exchange, ProcessName):
     # Start timer on function
     start = timer()
     # Setup outcome dictionary for algorithm
@@ -334,33 +337,45 @@ def testtoken(Token, Exchange):
         "DateTime": str(datetime.datetime.now()),
         "Outcome": "",
         "Token": Token,
-        "Exchange": Exchange
+        "Exchange": Exchange,
+        "ProcessName": ProcessName
     }
     # Get the token being assessed
-    # print(f'Now testing {Token} from {Exchange}')
     if Exchange == 'coinbase':
         query = {'base': Token}
-        TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)
-        outcomedict["Outcome"] = "TokenSearched"
+        try:
+            TokenDataFrame = genericdatamunging.getcoinbasepricedata(query)
+            outcomedict["Outcome"] = "TokenSearched"
+        except:
+            print(f"Unexpected error in searching for data (testtoken function): {sys.exc_info()[0]}")
+            outcomedict["Outcome"] = "SearchFailed"
     elif Exchange == 'binance':
         query = {"symbol": Token}
-        TokenDataFrame = genericdatamunging.getlastbinancepricedata(query)
-        outcomedict["Outcome"] = "TokenSearched"
+        try:
+            TokenDataFrame = genericdatamunging.getlastbinancepricedata(query)
+            outcomedict["Outcome"] = "TokenSearched"
+        except:
+            outcomedict["Outcome"] = "SearchFailed"
+            print(f"Unexpected error in searching for data (testtoken function): {sys.exc_info()[0]}")
     else:
         outcomedict["Outcome"] = "SearchFailed"
+        print(outcomedict)
         return outcomedict
 
     dbsearchtime = timer()
     timetaken = dbsearchtime - start
     outcomedict["DatabaseSearchTime"] = timetaken
 
-    # Pass returned dataframe to be analysed
-    result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1, BuyTolerance=0.1)
-    outcomedict["result"] = result
-    # Insert result into mongodb
-    mongodb.insertsingleintoalgorithmonewargame(result)
-    # Update outcome
-    outcomedict["Outcome"] = "TokenAnalysed"
+    if outcomedict["Outcome"] == "TokenSearched":
+        # Pass returned dataframe to be analysed
+        result = testalgorithmone(TokenDataFrame=TokenDataFrame, InvestmentAmount=10000, SellTolerance=0.1, BuyTolerance=0.1)
+        outcomedict["result"] = result
+        # Insert result into mongodb
+        mongodb.insertsingleintoalgorithmonewargame(result)
+        # Update outcome
+        outcomedict["Outcome"] = "TokenAnalysed"
+    else:
+        print("Token unable to be analysed as Token search failed")
     totaltime = timer()
     timetaken = totaltime - start
     outcomedict["TimeTaken"] = timetaken
