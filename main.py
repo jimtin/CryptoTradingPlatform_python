@@ -2,16 +2,10 @@ import pyfiglet
 from datagathering import datagathering
 from Trading import AlgorithmImplementation
 import multiprocessing
-from selfanalysis import dbanalysisclass
 from selfanalysis import performanceanalysislibrary
-from timeit import default_timer as timer
 import time
 
-# Function to remove worker process from jobs list
-def removerworkerproc(ProcessName, jobs):
-    # Find the index number in jobs list
-    index = jobs.index(ProcessName)
-    print(index)
+
 
 # Function to get outputs from analysis
 def analysetoken(Token, Exchange, Queue):
@@ -25,6 +19,8 @@ def analysetoken(Token, Exchange, Queue):
     }
     Queue.put(proccomplete)
 
+
+# Function to get a list of unique tokens currently held in database
 def gettokenlist():
     # Set up list to store token and exchange
     tokenlist = []
@@ -35,88 +31,12 @@ def gettokenlist():
         tokentuple = (token, "coinbase")
         tokenlist.append(tokentuple)
     # Get a list of binance tokens to analyse
-    #binancetokens = AlgorithmImplementation.getallbinancetokens()
+    binancetokens = AlgorithmImplementation.getallbinancetokens()
     # Add a list of tuples for binance coins to the total tokens to be analysed
-    #for token in binancetokens["UniqueBinanceTokens"]:
-    #    tokentuple = (token, "binance")
-    #    tokenlist.append(tokentuple)
+    for token in binancetokens["UniqueBinanceTokens"]:
+        tokentuple = (token, "binance")
+        tokenlist.append(tokentuple)
     return tokenlist
-
-
-# Function to build in effective multiprocessor handling. Starting with handling incoming analysis results
-def multiprocessor(CPUCores):
-    # todo: this needs to be a lot more robust
-    # Start timer
-    start = timer()
-    # Set up number of CPU Cores which can be used
-    numCPUs = CPUCores
-    # Get the list of tokens to be analysed
-    tokenlist = []
-
-    i = 0
-    totaltokens = len(tokenlist)
-    analyse = True
-    while analyse == True:
-        time.sleep(1)
-        if i < totaltokens:
-            # print("i is less than total tokens")
-            # print(f"Number of CPUs is {numCPUs}")
-            if numCPUs > 0:
-                token = tokenlist[i][0]
-                exchange = tokenlist[i][1]
-                # Get the number of remaining tokens
-                remainingtokens = totaltokens - i
-                if i > 4:
-                    # Small estimate on time remaining
-                    timesofar = timer()
-                    timetakensofar = (timesofar - 75) / i
-                    timeremaining = remainingtokens * timetakensofar
-                    print(
-                        f'Analysing {token} from {exchange}. {i} tokens analysed, {remainingtokens} remain. Average time per token is {timetakensofar}, estimated time remaining is {timeremaining}')
-                # Create the process to analyse the token
-                proc = multiprocessing.Process(target=analysetoken, args=(token, exchange, outputqueue), name=token)
-                # Add the process to processes list
-                processes.append(proc)
-                # Start the process
-                proc.start()
-                # Iterate to next token
-                i = i + 1
-                # Remove count of CPU to enable manual tracking etc
-                numCPUs = numCPUs - 1
-                print(f"Starting process {proc.name}")
-            # Sleep for 1 second to allow everything to catchup
-            elif numCPUs <= 0:
-                msg = outputqueue.get()
-                if msg != None:
-                    print(f"Token analysed: {msg['Token']}")
-                    for proc in processes:
-                        print(f"Process currently being analysed: {proc.name}")
-                        if proc.name == msg["Token"]:
-                            index = processes.index(proc)
-                            # print(f"Index of {proc.name} is {index}")
-                            print(f"Terminating process: {proc.name}")
-                            proc.terminate()
-                            # Add in a new CPU to the count
-                            numCPUs = numCPUs + 1
-                            processes.pop(index)
-        else:
-            analyse = False
-
-
-
-    end = timer()
-    timetaken = end-start
-    print(f'Function took {timetaken} seconds')
-    for proc in processes:
-        print(proc.name)
-
-
-def getqueue(QueueObject):
-    try:
-        output = QueueObject.get()
-    except:
-        output = "NoDice"
-    return output
 
 
 # Main function for CryptoTrading platform
@@ -155,13 +75,6 @@ if __name__ == "__main__":
     # Now set up the Algorithm process
     algorithm = multiprocessing.Process(target=AlgorithmImplementation.iteralgorithms, args=(tolerance, True), name=algorithmname)
     processes.append(algorithm)
-    # Don't start automatically
-    # algorithm.start()
-    # Set up the initial analyse all tokens algorithm as I continue to test it
-    # analysealgorithm = multiprocessing.Process(target=AlgorithmImplementation.testallcoinbasetokens, args=(), name="AlgorithmOneWargame")
-    # jobs.append(analysealgorithm)
-    # analysealgorithm.start()
-    # multiprocessalgorithonewargaming(CPUCores)
 
     # Set up an iterator
     i = 0
