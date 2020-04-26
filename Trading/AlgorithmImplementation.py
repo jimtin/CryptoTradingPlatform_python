@@ -7,7 +7,6 @@ from Trading import TradingFunctions
 from selfanalysis import logginglibrary
 import time
 from datamunging import genericdatamunging
-import pandas
 import numpy
 import datetime
 import sys
@@ -142,13 +141,14 @@ def testalgorithmone(TokenDataFrame, InvestmentAmount, BuyTolerance, SellToleran
         "DateTime": str(datetime.datetime.now()),
         "IndexError": 0
     }
+    ### Set up the variables for large scale searching ###
     # Get the Token name, store in dictionary
     tokenname = TokenDataFrame.tail(1).Token.values[0]
     result["Token"] = tokenname
     # Get the Exchange, store in dictionary
     tokenexchange = TokenDataFrame.tail(1).Exchange.values[0]
     result["Exchange"] = tokenexchange
-    # Figure out what success would look like (HODL)
+    # Define the HODL outcome
     startprice = TokenDataFrame.head(1).Price.values[0]
     result["TokenStartPrice"] = startprice
     endprice = TokenDataFrame.tail(1).Price.values[0]
@@ -266,7 +266,6 @@ def testtoken(Token, Exchange, ProcessName):
     start = timer()
     # Setup outcome dictionary for algorithm
     outcomedict = {
-        "HoursAssessed": 576,
         "TimeTaken": 0,
         "Key": "testtoken",
         "DatabaseSearchTime": 0,
