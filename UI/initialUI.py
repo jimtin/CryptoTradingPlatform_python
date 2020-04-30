@@ -31,7 +31,8 @@ class CTUI(QMainWindow):
         self._centralWidget.setLayout(self.generalLayout)
         # Create the display and the buttons
         self._createDisplay()
-        self._createButtons()
+        #self._createButtons()
+        self._createComboboxes()
 
     # Create display method
     def _createDisplay(self):
@@ -43,6 +44,25 @@ class CTUI(QMainWindow):
         self.display.setReadOnly(True)
         # Add the display to the general layout
         self.generalLayout.addWidget(self.display)
+
+    # Create dropdown boxes (called combo boxes in PyQT)
+    def _createComboboxes(self):
+        # Creat place to store the dropDowns
+        dropDownLayout = QGridLayout()
+        # Create the Algorithm dropdown box
+        self.dropDownBox = QComboBox()
+        self.dropDownBox.setObjectName(("AlgorithmBox"))
+        self.dropDownBox.addItem("AlgorithmOne")
+        self.dropDownBox.addItem("AlgorithmTwo")
+        dropDownLayout.addWidget(self.dropDownBox, 0, 0)
+        # Create self analysis dropdown box
+        self.dropDownBox = QComboBox()
+        self.dropDownBox.setObjectName("SelfAnalysisBox")
+        self.dropDownBox.addItem("Database")
+        self.dropDownBox.addItem("AlgorithmOneWargaming")
+        dropDownLayout.addWidget(self.dropDownBox, 0, 1)
+        self.generalLayout.addLayout(dropDownLayout)
+
 
     # Create the buttons and put into display
     def _createButtons(self):
