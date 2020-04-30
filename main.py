@@ -126,9 +126,9 @@ if __name__ == "__main__":
                                     processes.pop(index)
                                     # Add another CPU to the count
                                     CPUCores = CPUCores + 1
-
             else:
                 CPUFlag = ""
+                # todo: clean up the last four processes once they complete
         else:
             text = input('Input command: ')
             # text = "wargamealgorithmone"
